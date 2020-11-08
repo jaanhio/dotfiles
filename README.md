@@ -1,3 +1,3 @@
 # jaanhio's dotfiles
 
-Dotfiles configuration forked from [this](https://github.com/geerlingguy/dotfiles).
+Dotfiles configuration forked from [geerlingguy](https://github.com/geerlingguy/dotfiles).
