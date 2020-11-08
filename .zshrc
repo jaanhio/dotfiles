@@ -1,9 +1,3 @@
-#
-# .zshrc
-#
-# @author Jeff Geerling
-#
-
 # Colors.
 unset LSCOLORS
 export CLICOLOR=1
@@ -11,6 +5,9 @@ export CLICOLOR_FORCE=1
 
 # Don't require escaping globbing characters in zsh.
 unsetopt nomatch
+
+# Path to your oh-my-zsh installation.
+export ZSH="~/.oh-my-zsh"
 
 # Nicer prompt.
 export PS1=$'\n'"%F{green} %*%F %3~ %F{white}$ "
@@ -69,14 +66,53 @@ function gsync() {
 # Tell homebrew to not autoupdate every single time I run it (just once a week).
 export HOMEBREW_AUTO_UPDATE_SECS=604800
 
-# Super useful Docker container oneshots.
-# Usage: dockrun, or dockrun [centos7|fedora27|debian9|debian8|ubuntu1404|etc.]
-dockrun() {
- docker run -it geerlingguy/docker-"${1:-ubuntu1604}"-ansible /bin/bash
+# networking
+alias myip='curl http://whatismyip.akamai.com/'                    # myip:         Public facing IP Address
+alias netCons='lsof -i'                             # netCons:      Show all open TCP/IP sockets
+alias flushDNS='dscacheutil -flushcache'            # flushDNS:     Flush out the DNS Cache
+alias lsock='sudo /usr/sbin/lsof -i -P'             # lsock:        Display open sockets
+alias lsockU='sudo /usr/sbin/lsof -nP | grep UDP'   # lsockU:       Display only open UDP sockets
+alias lsockT='sudo /usr/sbin/lsof -nP | grep TCP'   # lsockT:       Display only open TCP sockets
+alias ipInfo0='ipconfig getpacket en0'              # ipInfo0:      Get info on connections for en0
+alias ipInfo1='ipconfig getpacket en1'              # ipInfo1:      Get info on connections for en1
+alias openPorts='sudo lsof -i | grep LISTEN'        # openPorts:    All listening connections
+alias showBlocked='sudo ipfw list'                  # showBlocked:  All ipfw rules inc/ blocked IPs
+
+
+alias '..'='cd ..'
+
+alias ls="ls -GFh"
+
+mkd() { mkdir -p "$@" && cd "$@"; }
+
+getpublicip() {
+	dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | awk -F'"' '{ print $2}'
+}
+
+# see invisible characters with sed
+seeinvischar(){
+	sed -n 'l' $1
+}
+
+# kubectl autocomplete
+source <(kubectl completion zsh)
+
+# get container IP Address
+dockergetip() {
+	ip=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $1)
+	echo "$1: $ip"
+}
+
+# docker kill and rm container
+dockerkillrm() {
+	for var in "$@"
+	do
+		docker kill $var | xargs docker rm
+	done
 }
 
 # Enter a running Docker container.
-function denter() {
+denter() {
  if [[ ! "$1" ]] ; then
      echo "You must supply a container ID or name."
      return 0
@@ -86,7 +122,6 @@ function denter() {
  return 0
 }
 
-# Delete a given line number in the known_hosts file.
 knownrm() {
  re='^[0-9]+$'
  if ! [[ $1 =~ $re ]] ; then
@@ -96,22 +131,15 @@ knownrm() {
  fi
 }
 
-# Allow Composer to use almost as much RAM as Chrome.
-export COMPOSER_MEMORY_LIMIT=-1
+# ZSH theme setup
+ZSH_THEME='powerlevel9k/powerlevel9k'
+source $ZSH/oh-my-zsh.sh
 
-# Ask for confirmation when 'prod' is in a command string.
-#prod_command_trap () {
-#  if [[ $BASH_COMMAND == *prod* ]]
-#  then
-#    read -p "Are you sure you want to run this command on prod [Y/n]? " -n 1 -r
-#    if [[ $REPLY =~ ^[Yy]$ ]]
-#    then
-#      echo -e "\nRunning command \"$BASH_COMMAND\" \n"
-#    else
-#      echo -e "\nCommand was not run.\n"
-#      return 1
-#    fi
-#  fi
-#}
-#shopt -s extdebug
-#trap prod_command_trap DEBUG
+# get route ip
+getRouterIp() {
+	netstat -nr | grep default
+}
+
+checkTabs() {
+	cat -e -t -v $1
+}
