@@ -7,7 +7,7 @@ export CLICOLOR_FORCE=1
 unsetopt nomatch
 
 # Path to your oh-my-zsh installation.
-export ZSH="~/.oh-my-zsh"
+export ZSH="/Users/$(whoami)/.oh-my-zsh"
 
 # Nicer prompt.
 export PS1=$'\n'"%F{green} %*%F %3~ %F{white}$ "
