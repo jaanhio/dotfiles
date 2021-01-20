@@ -129,7 +129,7 @@ knownrm() {
 }
 
 # ZSH theme setup
-ZSH_THEME='powerlevel9k/powerlevel9k'
+ZSH_THEME='agnoster'
 source $ZSH/oh-my-zsh.sh
 
 # get route ip
